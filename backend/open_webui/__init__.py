@@ -34,7 +34,7 @@ def main(
 
 @app.command()
 def serve(
-    host: str = '127.0.0.1',
+    host: str = '0.0.0.0',
     port: int = 8080,
 ):
     os.environ['FROM_INIT_PY'] = 'true'
@@ -94,7 +94,7 @@ def serve(
 
 @app.command()
 def dev(
-    host: str = '127.0.0.1',
+    host: str = '0.0.0.0',
     port: int = 8080,
     reload: bool = True,
 ):
