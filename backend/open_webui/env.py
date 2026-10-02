@@ -42,7 +42,7 @@ except ImportError:
     print('dotenv not installed, skipping...')
 
 DOCKER = os.getenv('DOCKER', 'False').lower() == 'true'
-USE_SLIM = os.getenv('USE_SLIM_DOCKER', 'False').lower() == 'true'
+USE_SLIM = os.getenv('USE_SLIM_DOCKER', os.getenv('USE_SLIM', 'True')).lower() == 'true'
 
 USE_CUDA = os.getenv('USE_CUDA_DOCKER', 'false')
 DEVICE_TYPE = 'cpu'
@@ -141,7 +141,13 @@ ENV = os.getenv('ENV', 'dev')
 FROM_INIT_PY = os.getenv('FROM_INIT_PY', 'False').lower() == 'true'
 
 if FROM_INIT_PY:
-    PACKAGE_DATA = {'version': importlib.metadata.version('open-webui')}
+    try:
+        PACKAGE_DATA = {'version': importlib.metadata.version('open-webui')}
+    except Exception:
+        try:
+            PACKAGE_DATA = json.loads((BASE_DIR / 'package.json').read_text())
+        except Exception:
+            PACKAGE_DATA = {'version': '0.11.0'}
 else:
     try:
         PACKAGE_DATA = json.loads((BASE_DIR / 'package.json').read_text())
@@ -226,6 +232,7 @@ CHANGELOG = changelog_json
 ####################################
 
 DATA_DIR = Path(os.getenv('DATA_DIR', BACKEND_DIR / 'data')).resolve()
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 if FROM_INIT_PY:
     NEW_DATA_DIR = Path(os.getenv('DATA_DIR', OPEN_WEBUI_DIR / 'data')).resolve()
